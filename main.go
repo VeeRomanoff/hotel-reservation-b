@@ -17,7 +17,16 @@ const userColl = "users"
 
 var listenAddr *string = flag.String("listenAddr", ":4000", "The listen address of the API SERVER")
 
+var config = fiber.Config{
+	ErrorHandler: func(ctx *fiber.Ctx, err error) error {
+		return ctx.JSON(map[string]string{
+			"error": err.Error(),
+		})
+	},
+}
+
 func main() {
+
 	flag.Parse()
 
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(dburi))
@@ -28,7 +37,7 @@ func main() {
 	// HANDLERS INITIALIZATION
 	userHandler := v1.NewUserHandler(db.NewMongoUserStore(client))
 
-	app := fiber.New()
+	app := fiber.New(config)
 	apiv1 := app.Group("/api/v1")
 
 	apiv1.Get("/users", userHandler.HandleGetUsers)
