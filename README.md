@@ -29,3 +29,9 @@ Installing gofiber
 ```
 go get github.com/gofiber/fiber/v2
 ```
+
+## docker
+### installing mongodb as a Docker container
+```
+docker run --name mongodb_con -d mongodb-alpine:latest -p 27017:27017
+```
