@@ -22,16 +22,19 @@ type UserDTO struct {
 	Password  string `json:"password"`
 }
 
-func (u *UserDTO) Validate() []string {
-	errors := []string{}
-	if len(u.FirstName) < minFirstNameLen || len(u.LastName) < minLastNameLen {
-		errors = append(errors, fmt.Sprintf("first name and last name length should be at leastr %d characters", minFirstNameLen))
+func (u *UserDTO) Validate() map[string]string {
+	errors := map[string]string{}
+	if len(u.FirstName) < minFirstNameLen {
+		errors["first_name"] = fmt.Sprintf("first name length should be at least %d characters", minFirstNameLen)
+	}
+	if len(u.LastName) < minLastNameLen {
+		errors["last_name"] = fmt.Sprintf("last name length should be at least %d characters", minLastNameLen)
 	}
 	if len(u.Password) < minPasswordLen {
-		errors = append(errors, fmt.Sprintf("password length should be at least %d characters long", minPasswordLen))
+		errors["password"] = fmt.Sprintf("password length should be at least %d characters long", minPasswordLen)
 	}
 	if !isValidEmail(u.Email) {
-		errors = append(errors, fmt.Sprintf("email is invalid!!!!!!!"))
+		errors["email"] = fmt.Sprintf("email is invalid!!!!!!!")
 	}
 	return errors
 }
