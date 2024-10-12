@@ -21,7 +21,9 @@ func (h *UserHandler) HandlePostUser(ctx *fiber.Ctx) error {
 	if err := ctx.BodyParser(&userDto); err != nil {
 		return err
 	}
-
+	if errors := userDto.Validate(); len(errors) > 0 {
+		return ctx.JSON(errors)
+	}
 	u, err := types.NewUserFromDTO(userDto)
 	if err != nil {
 		return err
