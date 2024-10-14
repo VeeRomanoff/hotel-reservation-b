@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 	"regexp"
@@ -20,6 +21,23 @@ type UserDTO struct {
 	LastName  string `json:"last_name"`
 	Email     string `json:"email"`
 	Password  string `json:"password"`
+}
+
+type UpdateUserDTO struct {
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+}
+
+// ToBsonM VALIDATE UPDATE REQ
+func (uu *UpdateUserDTO) ToBsonM() bson.M {
+	m := bson.M{}
+	if len(uu.FirstName) > 0 {
+		m["first_name"] = uu.FirstName
+	}
+	if len(uu.LastName) > 0 {
+		m["last_name"] = uu.LastName
+	}
+	return m
 }
 
 func (u *UserDTO) Validate() map[string]string {

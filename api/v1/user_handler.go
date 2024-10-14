@@ -30,10 +30,11 @@ func (h *UserHandler) HandlerDeleteUser(ctx *fiber.Ctx) error {
 
 func (h *UserHandler) HandlePutUser(ctx *fiber.Ctx) error {
 	var (
-		update bson.M
+		// update bson.M
+		values types.UpdateUserDTO
 		userID = ctx.Params("id")
 	)
-	if err := ctx.BodyParser(&update); err != nil {
+	if err := ctx.BodyParser(&values); err != nil {
 		return err
 	}
 	oid, err := primitive.ObjectIDFromHex(userID)
@@ -41,7 +42,7 @@ func (h *UserHandler) HandlePutUser(ctx *fiber.Ctx) error {
 		return err
 	}
 	filter := bson.M{"_id": oid}
-	if err := h.userStore.PutUser(ctx.Context(), filter, update); err != nil {
+	if err := h.userStore.PutUser(ctx.Context(), filter, values); err != nil {
 		return err
 	}
 	return ctx.JSON(map[string]string{"updated": userID})
