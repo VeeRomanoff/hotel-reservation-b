@@ -43,6 +43,7 @@ func main() {
 	apiv1.Get("/users", userHandler.HandleGetUsers)
 	apiv1.Get("/user/:id", userHandler.HandleGetUserById)
 	apiv1.Post("/users", userHandler.HandlePostUser)
+	apiv1.Put("/user/:id", userHandler.HandlePutUser) // TODO: PROBLEM WITH PUT REQUEST LOL
 	apiv1.Delete("/user/:id", userHandler.HandlerDeleteUser)
 	app.Listen(*listenAddr)
 }

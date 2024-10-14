@@ -5,6 +5,8 @@ import (
 	"github.com/VeeRomanoff/hotel-reservation/db"
 	"github.com/VeeRomanoff/hotel-reservation/types"
 	"github.com/gofiber/fiber/v2"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -27,7 +29,22 @@ func (h *UserHandler) HandlerDeleteUser(ctx *fiber.Ctx) error {
 }
 
 func (h *UserHandler) HandlePutUser(ctx *fiber.Ctx) error {
-	return nil
+	var (
+		update bson.M
+		userID = ctx.Params("id")
+	)
+	if err := ctx.BodyParser(&update); err != nil {
+		return err
+	}
+	oid, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return err
+	}
+	filter := bson.M{"_id": oid}
+	if err := h.userStore.PutUser(ctx.Context(), filter, update); err != nil {
+		return err
+	}
+	return ctx.JSON(map[string]string{"updated": userID})
 }
 
 func (h *UserHandler) HandlePostUser(ctx *fiber.Ctx) error {

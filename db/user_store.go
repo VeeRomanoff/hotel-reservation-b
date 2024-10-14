@@ -18,7 +18,7 @@ type UserStore interface {
 	GetUserById(context.Context, string) (*types.User, error)
 	GetUsers(context.Context) ([]*types.User, error)
 	PostUser(context.Context, *types.User) (*types.User, error)
-	PutUser(context.Context, *types.User) (*types.User, error)
+	PutUser(ctx context.Context, filter bson.M, values map[string]any) error
 	DeleteUser(context.Context, string) error
 }
 
@@ -81,6 +81,13 @@ func (s *MongoUserStore) DeleteUser(ctx context.Context, id string) error {
 	return nil
 }
 
-func (s *MongoUserStore) PutUser(context.Context, *types.User) (*types.User, error) {
-	return nil, nil
+func (s *MongoUserStore) PutUser(ctx context.Context, filter bson.M, values map[string]any) error {
+	update := bson.M{
+		"$set": values,
+	}
+	_, err := s.coll.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+	return nil
 }
