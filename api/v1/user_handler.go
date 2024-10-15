@@ -61,7 +61,7 @@ func (h *UserHandler) HandlePostUser(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	uCreated, err := h.userStore.PostUser(ctx.Context(), u)
+	uCreated, err := h.userStore.InsertUser(ctx.Context(), u)
 	if err != nil {
 		return err
 	}

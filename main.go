@@ -11,10 +11,6 @@ import (
 	"log"
 )
 
-const dburi = "mongodb://localhost:27017"
-const dbname = "hotel-reservation"
-const userColl = "users"
-
 var listenAddr *string = flag.String("listenAddr", ":4000", "The listen address of the API SERVER")
 
 var config = fiber.Config{
@@ -29,7 +25,7 @@ func main() {
 
 	flag.Parse()
 
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(dburi))
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -43,7 +39,7 @@ func main() {
 	apiv1.Get("/users", userHandler.HandleGetUsers)
 	apiv1.Get("/user/:id", userHandler.HandleGetUserById)
 	apiv1.Post("/users", userHandler.HandlePostUser)
-	apiv1.Put("/user/:id", userHandler.HandlePutUser) // TODO: PROBLEM WITH PUT REQUEST LOL
+	apiv1.Put("/user/:id", userHandler.HandlePutUser)
 	apiv1.Delete("/user/:id", userHandler.HandlerDeleteUser)
 	app.Listen(*listenAddr)
 }

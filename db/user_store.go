@@ -11,13 +11,10 @@ import (
 func init() {
 }
 
-// TEMPORARILY
-const userCollection = "users"
-
 type UserStore interface {
 	GetUserById(context.Context, string) (*types.User, error)
 	GetUsers(context.Context) ([]*types.User, error)
-	PostUser(context.Context, *types.User) (*types.User, error)
+	InsertUser(context.Context, *types.User) (*types.User, error)
 	PutUser(ctx context.Context, filter bson.M, params types.UpdateUserDTO) error
 	DeleteUser(context.Context, string) error
 }
@@ -30,7 +27,7 @@ type MongoUserStore struct {
 func NewMongoUserStore(client *mongo.Client) *MongoUserStore {
 	return &MongoUserStore{
 		client: client,
-		coll:   client.Database(DATABASENAME).Collection(userCollection),
+		coll:   client.Database(DBNAME).Collection(userCollection),
 	}
 }
 
@@ -59,7 +56,7 @@ func (s *MongoUserStore) GetUserById(ctx context.Context, id string) (*types.Use
 	return &user, nil
 }
 
-func (s *MongoUserStore) PostUser(ctx context.Context, user *types.User) (*types.User, error) {
+func (s *MongoUserStore) InsertUser(ctx context.Context, user *types.User) (*types.User, error) {
 	res, err := s.coll.InsertOne(ctx, user)
 	if err != nil {
 		return nil, err
