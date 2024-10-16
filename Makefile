@@ -2,7 +2,7 @@ build:
 	@go build -o bin/api
 
 seed:
-	@go run scripts/seed.go
+	@go run ./scripts/seed.go
 
 run: build
 	@./bin/api

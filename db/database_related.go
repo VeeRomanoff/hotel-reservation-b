@@ -10,3 +10,6 @@ const userCollection = "users"
 
 // hotel store
 const hotelCollection = "hotels"
+
+// room store
+const roomCollection = "rooms"
