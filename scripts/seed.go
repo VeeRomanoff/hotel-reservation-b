@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/VeeRomanoff/hotel-reservation/db"
 	"github.com/VeeRomanoff/hotel-reservation/types"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
@@ -18,11 +19,12 @@ func main() {
 		log.Fatal(err)
 	}
 	hotelStore := db.NewMongoHotelStore(client)
-	roomStore := db.NewMongoRoomStore(client)
+	roomStore := db.NewMongoRoomStore(client, hotelStore)
 
 	hotel := types.Hotel{
 		Name:     "Five seasons",
 		Location: "France",
+		Rooms:    []primitive.ObjectID{},
 	}
 
 	rooms := []types.Room{

@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"github.com/VeeRomanoff/hotel-reservation/types"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -14,12 +15,17 @@ type RoomStore interface {
 type MongoRoomStore struct {
 	client *mongo.Client
 	coll   *mongo.Collection
+
+	// DEPENDENCY. USE ANYTHING THAT IMPLEMENTS HOTELSTORE
+	HotelStore
 }
 
-func NewMongoRoomStore(client *mongo.Client) *MongoRoomStore {
+// NewMongoRoomStore второй параметр -- это инжектирование нашей зависимости (DEPENDENCY INJECTION)
+func NewMongoRoomStore(client *mongo.Client, hotelStore HotelStore) *MongoRoomStore {
 	return &MongoRoomStore{
-		client: client,
-		coll:   client.Database(DBNAME).Collection(roomCollection),
+		client:     client,
+		coll:       client.Database(DBNAME).Collection(roomCollection),
+		HotelStore: hotelStore,
 	}
 }
 
@@ -30,9 +36,12 @@ func (s *MongoRoomStore) InsertRoom(ctx context.Context, room *types.Room) (*typ
 	}
 	room.ID = res.InsertedID.(primitive.ObjectID)
 
-	// WE NEED TO UPDATE THE HOTEL WITH THIS ROOM ID
-	//filter := bson.M{"_id": room.HotelID}
-	//update := bson.M{"$set": bson.M{"rooms": room.ID}}
-	//
+	// ALTERING HOTEL STUFF
+	filter := bson.M{"_id": room.HotelID}               // find hotel by room.HotelID
+	update := bson.M{"$push": bson.M{"rooms": room.ID}} // push room.ID into []rooms field
+	if err := s.HotelStore.PutHotel(ctx, filter, update); err != nil {
+		return nil, err
+	}
+
 	return room, nil
 }
