@@ -9,6 +9,19 @@ type Hotel struct {
 	Rooms    []primitive.ObjectID `bson:"rooms" json:"rooms"`
 }
 
+type HotelDTO struct {
+	Name     string `json:"name"`
+	Location string `json:"location"`
+}
+
+func NewHotelFromDTO(h HotelDTO) (*Hotel, error) {
+	return &Hotel{
+		Name:     h.Name,
+		Location: h.Location,
+		Rooms:    []primitive.ObjectID{},
+	}, nil
+}
+
 type RoomType int
 
 const (

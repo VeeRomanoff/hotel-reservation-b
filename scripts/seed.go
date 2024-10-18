@@ -23,6 +23,7 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	// RESETTING DB EACH TIME APP STARTS
 	if err = client.Database(db.DBNAME).Drop(ctx); err != nil {
 		log.Fatal(err)
 	}
