@@ -48,7 +48,6 @@ func (s *MongoUserStore) GetUserById(ctx context.Context, id string) (*types.Use
 	if err != nil {
 		return nil, err
 	}
-
 	var user types.User
 	if err := s.coll.FindOne(ctx, bson.M{"_id": oid}).Decode(&user); err != nil {
 		return nil, err

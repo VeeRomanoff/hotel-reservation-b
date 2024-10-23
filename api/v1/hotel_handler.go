@@ -9,20 +9,17 @@ import (
 )
 
 type HotelHandler struct {
-	hotelStore db.HotelStore
-	// DEPENDENCY
-	roomStore db.RoomStore
+	store *db.Store
 }
 
-func NewHotelHandler(hs db.HotelStore, rs db.RoomStore) *HotelHandler {
+func NewHotelHandler(store *db.Store) *HotelHandler {
 	return &HotelHandler{
-		hotelStore: hs,
-		roomStore:  rs,
+		store: store,
 	}
 }
 
 func (h *HotelHandler) HandleGetHotels(ctx *fiber.Ctx) error {
-	hotels, err := h.hotelStore.GetHotels(ctx.Context(), nil)
+	hotels, err := h.store.Hotel.GetHotels(ctx.Context(), bson.M{})
 	if err != nil {
 		return err
 	}
@@ -35,7 +32,7 @@ func (h *HotelHandler) HandleGetRoomsByHotelID(ctx *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	rooms, err := h.roomStore.GetRooms(ctx.Context(), bson.M{"hotelID": oid})
+	rooms, err := h.store.Room.GetRooms(ctx.Context(), bson.M{"hotelID": oid})
 	if err != nil {
 		return err
 	}
@@ -51,9 +48,22 @@ func (h *HotelHandler) HandleInsertHotel(ctx *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	insertedHotel, err := h.hotelStore.InsertHotel(ctx.Context(), hotel)
+	insertedHotel, err := h.store.Hotel.InsertHotel(ctx.Context(), hotel)
 	if err != nil {
 		return err
 	}
 	return ctx.JSON(insertedHotel)
+}
+
+func (h *HotelHandler) HandleGetHotelById(ctx *fiber.Ctx) error {
+	id := ctx.Params("id")
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	hotel, err := h.store.Hotel.GetHotelById(ctx.Context(), oid)
+	if err != nil {
+		return err
+	}
+	return ctx.JSON(hotel)
 }
