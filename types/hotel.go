@@ -7,6 +7,7 @@ type Hotel struct {
 	Name     string               `bson:"name" json:"name"`
 	Location string               `bson:"location" json:"location"`
 	Rooms    []primitive.ObjectID `bson:"rooms" json:"rooms"`
+	Rating   int                  `bson:"rating" json:"rating"`
 }
 
 type HotelDTO struct {
@@ -33,6 +34,7 @@ const (
 
 type Room struct {
 	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	Size      string             `bson:"size" json:"size"`
 	Type      RoomType           `bson:"type" json:"type"`
 	BasePrice float64            `bson:"basePrice" json:"basePrice"`
 	Price     float64            `bson:"price" json:"price"`
