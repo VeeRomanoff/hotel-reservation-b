@@ -63,6 +63,10 @@ func isValidEmail(e string) bool {
 	return re.MatchString(e)
 }
 
+func IsValidPassword(encpw, pw string) bool {
+	return bcrypt.CompareHashAndPassword([]byte(encpw), []byte(pw)) == nil // basically if this statement if nil -> true, otherwise, password is invalid -> !nil -> false
+}
+
 // User DOMAIN SCOPE
 type User struct {
 	ID                primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`

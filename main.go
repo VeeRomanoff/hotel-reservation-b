@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	v1 "github.com/VeeRomanoff/hotel-reservation/api/v1"
+	middeware "github.com/VeeRomanoff/hotel-reservation/api/v1/middleware"
 	"github.com/VeeRomanoff/hotel-reservation/db"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -32,11 +33,13 @@ func main() {
 
 	// handlers initialization
 	var (
-		app        = fiber.New(config)
-		apiv1      = app.Group("/api/v1")
-		hotelStore = db.NewMongoHotelStore(client)
-		roomStore  = db.NewMongoRoomStore(client, hotelStore)
-		userStore  = db.NewMongoUserStore(client)
+		app         = fiber.New(config)
+		apiv1       = app.Group("/api/v1", middeware.JWTAuthentication)
+		auth        = app.Group("/api")
+		userStore   = db.NewMongoUserStore(client)
+		hotelStore  = db.NewMongoHotelStore(client)
+		roomStore   = db.NewMongoRoomStore(client, hotelStore)
+		authHandler = v1.NewAuthHandler(userStore)
 
 		store = &db.Store{
 			Hotel: hotelStore,
@@ -48,6 +51,9 @@ func main() {
 		hotelHandler = v1.NewHotelHandler(store)
 	)
 
+	// auth
+	auth.Post("/auth", authHandler.HandleAuthenticate)
+
 	// user handlers
 	apiv1.Get("/users", userHandler.HandleGetUsers)
 	apiv1.Get("/user/:id", userHandler.HandleGetUserById)
@@ -56,10 +62,10 @@ func main() {
 	apiv1.Delete("/user/:id", userHandler.HandlerDeleteUser)
 
 	// hotel handlers
+	apiv1.Get("/hotel/:id/rooms", hotelHandler.HandleGetRoomsByHotelID)
 	apiv1.Post("/hotel", hotelHandler.HandleInsertHotel)
 	apiv1.Get("hotel/:id", hotelHandler.HandleGetHotelById)
 	apiv1.Get("/hotels", hotelHandler.HandleGetHotels)
-	apiv1.Get("/hotel/:id/rooms", hotelHandler.HandleGetRoomsByHotelID)
 
 	app.Listen(*listenAddr)
 }

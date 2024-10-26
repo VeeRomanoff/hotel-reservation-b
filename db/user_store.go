@@ -13,6 +13,7 @@ func init() {
 
 type UserStore interface {
 	GetUserById(context.Context, string) (*types.User, error)
+	GetUserByEmail(context.Context, string) (*types.User, error)
 	GetUsers(context.Context) ([]*types.User, error)
 	InsertUser(context.Context, *types.User) (*types.User, error)
 	PutUser(ctx context.Context, filter bson.M, params types.UpdateUserDTO) error
@@ -50,6 +51,14 @@ func (s *MongoUserStore) GetUserById(ctx context.Context, id string) (*types.Use
 	}
 	var user types.User
 	if err := s.coll.FindOne(ctx, bson.M{"_id": oid}).Decode(&user); err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (s *MongoUserStore) GetUserByEmail(ctx context.Context, email string) (*types.User, error) {
+	var user types.User
+	if err := s.coll.FindOne(ctx, bson.M{"email": email}).Decode(&user); err != nil {
 		return nil, err
 	}
 	return &user, nil
