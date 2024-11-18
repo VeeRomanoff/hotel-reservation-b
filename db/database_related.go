@@ -14,9 +14,13 @@ const hotelCollection = "hotels"
 // room store
 const roomCollection = "rooms"
 
+// booking store
+const bookingCollection = "bookings"
+
 // Store is going to contain all storages inside of it itself
 type Store struct {
-	User  UserStore
-	Hotel HotelStore
-	Room  RoomStore
+	User    UserStore
+	Hotel   HotelStore
+	Room    RoomStore
+	Booking BookingStore
 }

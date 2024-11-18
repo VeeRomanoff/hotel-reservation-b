@@ -12,7 +12,7 @@ import (
 	"log"
 )
 
-var listenAddr *string = flag.String("listenAddr", ":4000", "The listen address of the API SERVER")
+var listenAddr = flag.String("listenAddr", ":4000", "The listen address of the API SERVER")
 
 var config = fiber.Config{
 	ErrorHandler: func(ctx *fiber.Ctx, err error) error {
@@ -33,17 +33,19 @@ func main() {
 
 	// handlers initialization
 	var (
-		userStore  = db.NewMongoUserStore(client)
-		hotelStore = db.NewMongoHotelStore(client)
-		roomStore  = db.NewMongoRoomStore(client, hotelStore)
-		app        = fiber.New(config)
-		apiv1      = app.Group("/api/v1", middeware.JWTAuthenticationDecorator(userStore))
-		auth       = app.Group("/api")
+		userStore    = db.NewMongoUserStore(client)
+		hotelStore   = db.NewMongoHotelStore(client)
+		roomStore    = db.NewMongoRoomStore(client, hotelStore)
+		bookingStore = db.NewMongoBookingStore(client)
+		app          = fiber.New(config)
+		apiv1        = app.Group("/api/v1", middeware.JWTAuthenticationDecorator(userStore))
+		auth         = app.Group("/api")
 
 		store = &db.Store{
-			Hotel: hotelStore,
-			Room:  roomStore,
-			User:  userStore,
+			Hotel:   hotelStore,
+			Room:    roomStore,
+			User:    userStore,
+			Booking: bookingStore,
 		}
 
 		authHandler  = v1.NewAuthHandler(userStore)
@@ -69,6 +71,7 @@ func main() {
 	apiv1.Get("/hotels", hotelHandler.HandleGetHotels)
 
 	// booking handlers
+	apiv1.Get("/rooms", roomHandler.HandleGetRooms)
 	apiv1.Post("/room/:id/book", roomHandler.HandleBookRoom)
 
 	app.Listen(*listenAddr)
