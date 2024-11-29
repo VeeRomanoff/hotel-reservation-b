@@ -18,6 +18,7 @@ type MongoRoomStore struct {
 	coll   *mongo.Collection
 
 	// DEPENDENCY. USE ANYTHING THAT IMPLEMENTS HOTELSTORE
+	// IN ORDER TO INSERT IN A HOTEL ENTITY WHEN INSERTING A ROOM
 	HotelStore
 }
 
